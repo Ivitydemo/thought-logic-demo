@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Intelligence System - Thought Logic Demo</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #f5f7fa;
+        }
+        .container { max-width: 1100px; margin: 0 auto; background: white; }
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 1rem; font-weight: 700; }
+        .header p { font-size: 1.3rem; opacity: 0.95; line-height: 1.8; }
+        .section { padding: 3rem 2rem; border-bottom: 1px solid #e2e8f0; }
+        .section:last-child { border-bottom: none; }
+        h2 { 
+            font-size: 2rem; 
+            color: #2563eb; 
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 3px solid #2563eb;
+        }
+        h3 { font-size: 1.4rem; color: #2d3748; margin: 2rem 0 1rem 0; }
+        .problem-box {
+            background: #fff5f5;
+            border-left: 5px solid #f56565;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        .solution-box {
+            background: #f0fff4;
+            border-left: 5px solid #48bb78;
+            padding: 2rem;
+            border-radius: 8px;
+            margin: 2rem 0;
+        }
+        .example-box {
+            background: #fffaf0;
+            border: 3px solid #ed8936;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .alert-box {
+            background: #fff5f5;
+            border: 3px solid #f56565;
+            border-radius: 8px;
+            padding: 2rem;
+            margin: 2rem 0;
+            text-align: center;
+        }
+        .alert-box h3 {
+            color: #c53030;
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+        }
+        ul { margin: 1rem 0 1rem 2rem; }
+        li { margin-bottom: 0.75rem; line-height: 1.8; }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 2rem 0;
+            font-size: 0.95rem;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th { 
+            background: #2563eb; 
+            font-weight: 700; 
+            color: white;
+            font-size: 1rem;
+        }
+        .highlight { 
+            background: #fff5f5; 
+            font-weight: 700;
+        }
+        .covered-row {
+            background: #f0fff4;
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #f7fafc, #edf2f7);
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        .stat-label { 
+            font-size: 0.95rem; 
+            color: #4a5568;
+            line-height: 1.5;
+        }
+        .coverage-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+        .office-card {
+            border: 3px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .office-card.covered {
+            border-color: #48bb78;
+            background: #f0fff4;
+        }
+        .office-card.missing {
+            border-color: #f56565;
+            background: #fff5f5;
+        }
+        .office-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+        .office-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        .status-badge {
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 700;
+        }
+        .status-covered {
+            background: #48bb78;
+            color: white;
+        }
+        .status-missing {
+            background: #f56565;
+            color: white;
+        }
+        .exec-info {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 2px solid #e2e8f0;
+        }
+        .exec-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+            color: #2d3748;
+        }
+        .exec-title {
+            color: #718096;
+            font-size: 0.9rem;
+            margin-bottom: 0.75rem;
+            line-height: 1.5;
+        }
+        .relationship {
+            font-size: 0.9rem;
+            padding: 0.75rem;
+            border-radius: 6px;
+            margin-top: 0.75rem;
+            font-weight: 600;
+        }
+        .relationship.yes {
+            background: #c6f6d5;
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+        .relationship.no {
+            background: #fed7d7;
+            color: #742a2a;
+            border-left: 4px solid #f56565;
+        }
+        .opportunity {
+            background: #fffaf0;
+            border: 2px solid #ed8936;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
+        }
+        .opportunity strong {
+            color: #c05621;
+        }
+        .cta {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .cta h2 { 
+            color: white; 
+            margin-bottom: 1.5rem;
+            border: none;
+        }
+        .cta p { font-size: 1.2rem; margin-bottom: 2rem; line-height: 1.8; }
+        .contact {
+            background: #2d3748;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .contact a { color: #90cdf4; text-decoration: none; font-weight: 600; }
+        .account-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.5rem;
+            padding: 1.5rem;
+            background: #edf2f7;
+            border-radius: 8px;
+            border-left: 5px solid #2563eb;
+        }
+        @media (max-width: 768px) {
+            .header h1 { font-size: 1.8rem; }
+            .header p { font-size: 1.1rem; }
+            h2 { font-size: 1.5rem; }
+            .stat-value { font-size: 2rem; }
+            .section { padding: 2rem 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎯 Stop Getting Siloed in Your Enterprise Accounts</h1>
+            <p>Account Intelligence System for Thought Logic</p>
+            <p style="font-size: 1.1rem; margin-top: 1rem; opacity: 0.9;">Map all 5 "offices" (Finance, Revenue, Operations, HR, Technology) · Surface $385M+ in missed opportunities · Schedule meetings with previously inaccessible decision-makers</p>
+        </div>
+        
+        <!-- THE PROBLEM -->
+        <div class="section">
+            <h2>The Silo Problem: You're Missing 80% of Each Account</h2>
+            
+            <div class="problem-box">
+                <h3 style="margin-top: 0;">❌ Current State at Thought Logic</h3>
+                <ul style="font-size: 1.05rem;">
+                    <li><strong>One functional area per engagement:</strong> "We're doing EPM for Finance at Delta, but Operations has a $25M transformation project with zero Thought Logic contact"</li>
+                    <li><strong>Missing cross-functional opportunities:</strong> Finance engagement at McKesson, but HR/Operations/Revenue/Technology teams have active initiatives</li>
+                    <li><strong>Manual account research takes hours:</strong> Consultants spend time on LinkedIn trying to figure out who to talk to next</li>
+                    <li><strong>No visibility for leadership:</strong> "Which 'offices' (Finance, Revenue, Ops, HR, Tech) do we cover? Which are we missing?"</li>
+                    <li><strong>Competitors (Bain, McKinsey, Deloitte) are already engaging</strong> with the executives you don't know exist</li>
+                </ul>
+            </div>
+            
+            <h3>Real Example: Delta Air Lines (Your Current Account)</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">"Office" / Function</th>
+                        <th style="width: 30%;">Active Initiative</th>
+                        <th style="width: 15%;">Budget</th>
+                        <th style="width: 30%;">Thought Logic Contact?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="covered-row">
+                        <td><strong>Office of Finance</strong></td>
+                        <td>EPM transformation</td>
+                        <td><strong>$15M</strong></td>
+                        <td><strong>✅ Active engagement</strong></td>
+                    </tr>
+                    <tr class="highlight">
+                        <td><strong>Office of Operations</strong></td>
+                        <td>Process improvement / digital ops</td>
+                        <td><strong>$25M</strong></td>
+                        <td><strong>❌ No COO contact</strong></td>
+                    </tr>
+                    <tr class="highlight">
+                        <td><strong>Office of Revenue</strong></td>
+                        <td>Sales effectiveness / pricing optimization</td>
+                        <td><strong>$18M</strong></td>
+                        <td><strong>❌ No CRO contact</strong></td>
+                    </tr>
+                    <tr class="highlight">
+                        <td><strong>Office of Technology</strong></td>
+                        <td>Cloud platform transformation</td>
+                        <td><strong>$30M</strong></td>
+                        <td><strong>❌ Never contacted CTO</strong></td>
+                    </tr>
+                    <tr class="highlight">
+                        <td><strong>Office of Human Resources</strong></td>
+                        <td>Organizational effectiveness</td>
+                        <td><strong>$12M</strong></td>
+                        <td><strong>❌ No CHRO relationship</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="alert-box">
+                <h3>🚨 You Have 20% Coverage at Delta Air Lines</h3>
+                <p style="font-size: 1.2rem; margin-top: 1rem;"><strong>Active $15M Finance engagement → Missing $85M across Operations, Revenue, Technology, HR</strong></p>
+                <p style="margin-top: 1rem; font-size: 1.1rem;">While you're siloed in Finance, competitors are likely engaged with other functions.</p>
+            </div>
+        </div>
+        
+        <!-- THE SOLUTION -->
+        <div class="section">
+            <h2>The Solution: Automated Account Intelligence</h2>
+            
+            <div class="solution-box">
+                <h3 style="margin-top: 0;">✅ What the System Does</h3>
+                <ul style="font-size: 1.05rem;">
+                    <li><strong>Maps all functional leaders:</strong> Every "office" (Finance, Revenue, Ops, HR, Tech) at target enterprise accounts</li>
+                    <li><strong>Tracks your relationships:</strong> Who does your team know? Which C-suite / VP-level contacts are missing?</li>
+                    <li><strong>Monitors transformation signals 24/7:</strong> New CFO/COO/CRO hires, initiative announcements, budget increases</li>
+                    <li><strong>Surfaces cross-functional gaps:</strong> "Delta COO has $25M ops transformation, you have no relationship"</li>
+                    <li><strong>AI-drafts specific outreach:</strong> Personalized emails, warm intro requests, relevant case studies</li>
+                </ul>
+            </div>
+            
+            <div class="stats">
+                <div class="stat-card">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">1️⃣</div>
+                    <div class="stat-label"><strong>Automated Intelligence</strong><br>Monitors enterprise accounts 24/7 for transformation signals</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">2️⃣</div>
+                    <div class="stat-label"><strong>Relationship Mapping</strong><br>Day 1 baseline: Which "offices" do you cover?</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">3️⃣</div>
+                    <div class="stat-label"><strong>Gap Analysis</strong><br>Shows which functional leaders you're missing</div>
+                </div>
+                <div class="stat-card">
+                    <div style="font-size: 2.5rem; margin-bottom: 1rem;">4️⃣</div>
+                    <div class="stat-label"><strong>AI-Drafted Outreach</strong><br>Personalized emails from YOUR consultants</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- REAL DATA: DELTA -->
+        <div class="section">
+            <h2>Live Data: What Your Consultants See Daily</h2>
+            
+            <div class="account-name">Delta Air Lines - Executive "Offices" Map</div>
+            
+            <div class="alert-box">
+                <h3>🚨 SILO ALERT: 1 of 5 Offices Covered</h3>
+                <p style="font-size: 1.1rem;"><strong>Current:</strong> Active relationship with Office of Finance</p>
+                <p style="font-size: 1.1rem; margin-top: 0.5rem;"><strong>Missing:</strong> Zero relationships with Operations, Revenue, Technology, or HR leadership</p>
+            </div>
+
+            <div class="coverage-grid">
+                <div class="office-card covered">
+                    <div class="office-header">
+                        <div class="office-title">Office of Finance</div>
+                        <span class="status-badge status-covered">✓ COVERED</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Dan Janki</div>
+                        <div class="exec-title">Executive Vice President & Chief Financial Officer</div>
+                        <div class="relationship yes">
+                            ✓ Active relationship<br>
+                            Current project: EPM transformation ($15M)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of Operations</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">John Laughter</div>
+                        <div class="exec-title">EVP, Chief of Operations & President, Delta TechOps</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Oversees global operations, reliability, analytics
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>🔥 Trigger:</strong> Recent earnings calls emphasized "real-time operations platform" 3x — $25M+ operations transformation underway
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of Revenue</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Steve Sear</div>
+                        <div class="exec-title">EVP – Global Sales and Distribution</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Leads worldwide customer programs, corporate relationships
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>Opportunity:</strong> Sales effectiveness, pricing optimization, distribution strategy ($18M estimated)
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of Technology</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Rahul Samant</div>
+                        <div class="exec-title">EVP & Chief Information Officer</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Responsible for IT, digital strategy, cybersecurity
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>🔥 Trigger:</strong> Multi-year cloud migration and digital transformation — $30M+ technology investment
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of HR / People</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Allison Ausband</div>
+                        <div class="exec-title">EVP & Chief People Officer</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Leads talent for 100,000 employees
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>Opportunity:</strong> Organizational effectiveness, change management for 100K+ global workforce ($12M estimated)
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <h3 style="margin-top: 0; color: #c05621;">What This Intelligence Enables:</h3>
+                <ul style="font-size: 1.05rem;">
+                    <li><strong>Leverage Dan Janki (CFO) relationship:</strong> Request warm introductions to peer executives (John Laughter, Steve Sear, Rahul Samant, Allison Ausband)</li>
+                    <li><strong>Target specific initiatives:</strong> Operations transformation, revenue optimization, technology platform upgrades, organizational effectiveness</li>
+                    <li><strong>Schedule meetings with decision-makers:</strong> AI-drafted outreach emails customized for each executive's portfolio</li>
+                    <li><strong>Pipeline estimate:</strong> $85M+ in currently invisible opportunities across four unmapped offices</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- REAL DATA: McKESSON -->
+        <div class="section">
+            <div class="account-name">McKesson Corporation - Executive "Offices" Map</div>
+            
+            <div class="alert-box">
+                <h3>🚨 SILO ALERT: 1 of 5 Offices Covered</h3>
+                <p style="font-size: 1.1rem;"><strong>Current:</strong> Strong relationship with CFO (Finance)</p>
+                <p style="font-size: 1.1rem; margin-top: 0.5rem;"><strong>Missing:</strong> Operations, Revenue/Strategy, Technology, HR executive relationships</p>
+            </div>
+
+            <div class="coverage-grid">
+                <div class="office-card covered">
+                    <div class="office-header">
+                        <div class="office-title">Office of Finance</div>
+                        <span class="status-badge status-covered">✓ COVERED</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Britt Vitalone</div>
+                        <div class="exec-title">Executive Vice President & Chief Financial Officer</div>
+                        <div class="relationship yes">
+                            ✓ Active relationship<br>
+                            Current project: FP&A optimization
+                        </div>
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of Operations</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Joan Eliasek</div>
+                        <div class="exec-title">President, North American Pharmaceutical Distribution</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Oversees pharmaceutical distribution across North America
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>Opportunity:</strong> Supply chain optimization, distribution network efficiency, process improvement
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of Revenue & Strategy</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Tom Rodgers</div>
+                        <div class="exec-title">EVP & Chief Strategy and Business Development Officer</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Leads strategy, M&A, business development
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>🔥 Trigger:</strong> Healthcare consolidation trend — strategic planning, market analysis, growth initiatives
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of Technology</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">Francisco Fraga</div>
+                        <div class="exec-title">EVP, Chief Information Officer & Chief Technology Officer</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Responsible for IT and technology strategy
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>Opportunity:</strong> Healthcare IT transformation, data integration, cybersecurity for pharmaceutical data
+                    </div>
+                </div>
+
+                <div class="office-card missing">
+                    <div class="office-header">
+                        <div class="office-title">Office of HR / People</div>
+                        <span class="status-badge status-missing">✗ MISSING</span>
+                    </div>
+                    <div class="exec-info">
+                        <div class="exec-name">LeAnn Smith</div>
+                        <div class="exec-title">EVP & Chief Human Resources Officer</div>
+                        <div class="relationship no">
+                            ✗ No relationship<br>
+                            Leads human resources strategy
+                        </div>
+                    </div>
+                    <div class="opportunity">
+                        <strong>Opportunity:</strong> Talent strategy for healthcare workforce, organizational design, retention programs
+                    </div>
+                </div>
+            </div>
+
+            <div class="example-box">
+                <h3 style="margin-top: 0; color: #c05621;">Pipeline Potential: $120M+</h3>
+                <p style="font-size: 1.05rem; margin-top: 1rem;">Healthcare distribution giant with massive transformation initiatives across unmapped functions. Britt Vitalone (CFO) can introduce to Francisco Fraga (Technology), Joan Eliasek (Operations), LeAnn Smith (HR).</p>
+            </div>
+        </div>
+
+        <!-- TARGET: HOME DEPOT -->
+        <div class="section">
+            <div class="account-name">Home Depot (Target Account) - Entry Point Analysis</div>
+            
+            <div class="example-box">
+                <h3 style="margin-top: 0; color: #c05621;">🎯 TARGET ACCOUNT: Zero Current Relationships</h3>
+                <p style="font-size: 1.1rem; margin-top: 1rem;"><strong>Company:</strong> Largest home improvement retailer in U.S. · $150B+ revenue · 2,300+ stores · 500,000+ employees</p>
+                <p style="font-size: 1.1rem; margin-top: 0.75rem;"><strong>Intelligence System provides:</strong> Real-time mapping of all five executive "offices," recent leadership changes, active transformation initiatives, and optimal entry points</p>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <div class="stat-value">5</div>
+                    <div class="stat-label">Executive Offices to Map</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$180M+</div>
+                    <div class="stat-label">Estimated Transformation Spend</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">0</div>
+                    <div class="stat-label">Current Relationships</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label">Upside Opportunity</div>
+                </div>
+            </div>
+
+            <div class="solution-box">
+                <h3 style="margin-top: 0;">How Intelligence System Creates Entry Points:</h3>
+                <ul style="font-size: 1.05rem;">
+                    <li><strong>Leadership change alerts:</strong> New CFO, COO, CIO = 90-day window during onboarding</li>
+                    <li><strong>Initiative tracking:</strong> Earnings calls, press releases, job postings signal transformation projects</li>
+                    <li><strong>Warm intro paths:</strong> Map connections through board members, alumni networks, partner relationships</li>
+                    <li><strong>Customized outreach:</strong> AI-drafted emails: "Saw your cloud transformation announcement..."</li>
+                    <li><strong>Multi-office approach:</strong> System identifies best entry point based on current initiatives</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- COMBINED OPPORTUNITY -->
+        <div class="section">
+            <h2>The Pattern Across All Three Accounts</h2>
+            
+            <div style="background: #edf2f7; padding: 2rem; border-radius: 12px; border-left: 5px solid #2563eb;">
+                <table style="margin: 0;">
+                    <tr>
+                        <th>Account</th>
+                        <th>Current Coverage</th>
+                        <th>Missed Offices</th>
+                        <th>Pipeline Opportunity</th>
+                    </tr>
+                    <tr>
+                        <td><strong>Delta Air Lines</strong></td>
+                        <td>Finance (20%)</td>
+                        <td>Ops, Revenue, Tech, HR</td>
+                        <td><strong>$85M+</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>McKesson</strong></td>
+                        <td>Finance (20%)</td>
+                        <td>Ops, Strategy, Tech, HR</td>
+                        <td><strong>$120M+</strong></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Home Depot</strong></td>
+                        <td>None (0%)</td>
+                        <td>All 5 offices</td>
+                        <td><strong>$180M+</strong></td>
+                    </tr>
+                    <tr style="background: #fff5f5; font-size: 1.1rem;">
+                        <td colspan="3"><strong>TOTAL INVISIBLE PIPELINE:</strong></td>
+                        <td><strong style="color: #2563eb; font-size: 1.4rem;">$385M+</strong></td>
+                    </tr>
+                </table>
+            </div>
+
+            <h3>What Intelligence System Enables (Results, Not Time Savings):</h3>
+            
+            <div class="stats" style="margin-top: 2rem;">
+                <div class="stat-card" style="border: 2px solid #48bb78;">
+                    <div class="stat-value" style="color: #48bb78; font-size: 1.5rem;">Schedule Meetings</div>
+                    <div class="stat-label">With previously inaccessible COOs, CROs, CIOs, CHROs overseeing $50M-$150M initiatives</div>
+                </div>
+                <div class="stat-card" style="border: 2px solid #48bb78;">
+                    <div class="stat-value" style="color: #48bb78; font-size: 1.5rem;">Establish Relationships</div>
+                    <div class="stat-label">Move from single-function silo to enterprise-wide trusted advisor status</div>
+                </div>
+                <div class="stat-card" style="border: 2px solid #48bb78;">
+                    <div class="stat-value" style="color: #48bb78; font-size: 1.5rem;">Generate Pipeline</div>
+                    <div class="stat-label">Surface $385M+ in transformation opportunities currently invisible to sales team</div>
+                </div>
+                <div class="stat-card" style="border: 2px solid #48bb78;">
+                    <div class="stat-value" style="color: #48bb78; font-size: 1.5rem;">Win Deals</div>
+                    <div class="stat-label">Engage early in initiative lifecycle when consulting decisions are made</div>
+                </div>
+            </div>
+
+            <div class="alert-box" style="text-align: left; margin-top: 3rem;">
+                <h3 style="margin-bottom: 1.5rem; text-align: center;">The Difference</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                    <div>
+                        <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #742a2a;">❌ Without This System:</p>
+                        <p>Consultants rely on manual research, LinkedIn searches, and hope. They don't know John Laughter (Delta COO) exists, don't know he's overseeing $25M operations transformation, and certainly can't get a meeting.</p>
+                    </div>
+                    <div>
+                        <p style="font-size: 1.2rem; font-weight: 600; margin-bottom: 1rem; color: #22543d;">✅ With This System:</p>
+                        <p>"Dan Janki (Delta CFO) can you introduce me to John Laughter? Saw he's leading the operations transformation, we've done similar work for United Airlines..." → <strong>Meeting scheduled → Relationship established → Deal in motion.</strong></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- INVESTMENT -->
+        <div class="section">
+            <h2>90-Day Pilot: Prove ROI, Then Scale</h2>
+            
+            <div style="background: linear-gradient(135deg, #f7fafc, #edf2f7); border: 3px solid #2563eb; border-radius: 12px; padding: 3rem; text-align: center; margin: 2rem 0;">
+                <h3 style="color: #2563eb; margin-bottom: 1rem; font-size: 2rem;">Recommended Pilot</h3>
+                <div style="font-size: 4rem; font-weight: 700; color: #2563eb; margin: 1.5rem 0;">$25K</div>
+                <p style="font-size: 1.3rem; color: #4a5568; margin-bottom: 2rem;">Flat fee · 90 days · Prove the model</p>
+                
+                <div style="text-align: left; max-width: 700px; margin: 2rem auto; background: white; padding: 2rem; border-radius: 8px;">
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ 15 target accounts</strong> (Delta, McKesson, Home Depot + 12 more)</p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ 3 consultants</strong> (different practice areas)</p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ All 5 "offices"</strong> mapped per account (Finance, Revenue, Ops, HR, Tech)</p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ Weekly intelligence reports</strong></p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ Baseline coverage mapping</strong> (Day 1)</p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ Ongoing relationship tracking</strong></p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ AI-drafted outreach emails</strong></p>
+                    <p style="margin: 0.75rem 0; font-size: 1.05rem;"><strong>✓ Leadership dashboard</strong></p>
+                </div>
+            </div>
+
+            <div class="example-box" style="text-align: center; font-size: 1.3rem; margin-top: 2rem;">
+                <strong>If system generates 1 incremental $3M engagement in 6 months → ROI = 15X+</strong>
+            </div>
+
+            <h3>Post-Pilot Pricing (Monthly Subscription):</h3>
+            <table style="margin-top: 1.5rem;">
+                <tr>
+                    <th>Team Size</th>
+                    <th>Monthly Investment</th>
+                    <th>Accounts Monitored</th>
+                </tr>
+                <tr>
+                    <td>10 consultants</td>
+                    <td>$4K/month</td>
+                    <td>30 accounts</td>
+                </tr>
+                <tr>
+                    <td>25 consultants</td>
+                    <td>$8K/month</td>
+                    <td>50 accounts</td>
+                </tr>
+                <tr>
+                    <td>50+ consultants</td>
+                    <td>$12K/month</td>
+                    <td>Unlimited</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- IMPORTANT NOTE -->
+        <div class="section">
+            <h2>Why This Isn't "Cold Email Outreach"</h2>
+            
+            <div class="problem-box">
+                <h3 style="margin-top: 0;">We Know Traditional Cold Outreach Doesn't Work</h3>
+                <p style="font-size: 1.1rem; margin-top: 1rem;">You've tried cold email outreach before — didn't get earth-shattering results. That's because:</p>
+                <ul style="font-size: 1.05rem; margin-top: 1rem;">
+                    <li>No relationship context (spray-and-pray to strangers)</li>
+                    <li>Generic templates (no intelligence about what they care about)</li>
+                    <li>Volume-based approach (hope something sticks)</li>
+                </ul>
+            </div>
+
+            <div class="solution-box">
+                <h3 style="margin-top: 0;">This Is Strategic Account Intelligence</h3>
+                <p style="font-size: 1.1rem; margin-top: 1rem;"><strong>Intelligence-first approach that happens to generate email drafts:</strong></p>
+                <ul style="font-size: 1.05rem; margin-top: 1rem;">
+                    <li><strong>WHO to talk to:</strong> Map all 5 "offices," identify which decision-makers you're missing</li>
+                    <li><strong>WHEN they're receptive:</strong> Trigger events (new hire, initiative announcement, budget increase)</li>
+                    <li><strong>WHAT they care about:</strong> Specific initiatives, real transformation projects, actual pain points</li>
+                    <li><strong>Then draft personalized outreach</strong> based on real intelligence, not generic templates</li>
+                </ul>
+                <p style="font-size: 1.15rem; margin-top: 1.5rem; font-weight: 600; color: #22543d;">This is account planning intelligence that identifies relationships worth building — then helps you build them.</p>
+            </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="cta">
+            <h2>Ready to Go Deep & Wide in Your Enterprise Accounts?</h2>
+            <p>Let's prove this works for Thought Logic in 90 days</p>
+            
+            <div style="background: rgba(255,255,255,0.15); padding: 2rem; border-radius: 12px; margin: 2rem auto; max-width: 700px; text-align: left;">
+                <h3 style="color: white; margin-bottom: 1.5rem; text-align: center;">Questions to Discuss:</h3>
+                <ul style="list-style: none; font-size: 1.15rem; line-height: 2;">
+                    <li>• Which 3 consultants would be good pilot candidates?</li>
+                    <li>• Which accounts are priorities beyond Delta, McKesson, Home Depot?</li>
+                    <li>• Which "offices" do you most want to expand into?</li>
+                    <li>• What does success look like (metrics)?</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="contact">
+            <h3 style="color: white; margin-bottom: 1rem; font-size: 1.5rem;">Let's Talk</h3>
+            <p style="font-size: 1.3rem; margin-bottom: 0.5rem;"><strong>John Anthony</strong> | Founder, Ivity</p>
+            <p style="font-size: 1.2rem;"><a href="mailto:john@ivity.io">john@ivity.io</a> | (615) 483-5866</p>
+        </div>
+    </div>
+</body>
+</html>
