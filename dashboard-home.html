@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Account Intelligence Dashboard - Thought Logic</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #2d3748;
+            background: #f5f7fa;
+            padding: 2rem;
+        }
+        .container { max-width: 1600px; margin: 0 auto; }
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        h1 { font-size: 2rem; }
+        .consultant-info { font-size: 1rem; opacity: 0.9; }
+        
+        .hot-alerts {
+            background: #fff5f5;
+            border: 3px solid #f56565;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .hot-header {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #c53030;
+            margin-bottom: 1rem;
+        }
+        
+        .hot-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+        }
+        
+        .hot-item {
+            background: white;
+            border-left: 5px solid #f56565;
+            padding: 1rem;
+            border-radius: 6px;
+        }
+        
+        .hot-account {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .hot-contact {
+            font-size: 0.95rem;
+            color: #4a5568;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hot-reason {
+            font-size: 0.9rem;
+            color: #742a2a;
+            font-weight: 600;
+        }
+        
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 1.5rem;
+        }
+        
+        .account-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            overflow: hidden;
+            transition: transform 0.2s;
+        }
+        
+        .account-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+        }
+        
+        .account-header {
+            padding: 1.5rem;
+            background: linear-gradient(135deg, #edf2f7 0%, #e2e8f0 100%);
+            border-bottom: 2px solid #cbd5e0;
+        }
+        
+        .account-name {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .account-meta {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+        
+        .coverage-bar-container {
+            background: #e2e8f0;
+            height: 30px;
+            border-radius: 15px;
+            overflow: hidden;
+            margin: 1rem 0;
+            position: relative;
+        }
+        
+        .coverage-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #48bb78 0%, #38a169 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: width 0.3s;
+        }
+        
+        .coverage-bad {
+            background: linear-gradient(90deg, #f56565 0%, #e53e3e 100%);
+        }
+        
+        .coverage-label {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 0.9rem;
+            pointer-events: none;
+        }
+        
+        .offices-breakdown {
+            padding: 1rem 1.5rem;
+            background: #f7fafc;
+            font-size: 0.85rem;
+        }
+        
+        .office-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .office-row:last-child {
+            border-bottom: none;
+        }
+        
+        .office-covered {
+            color: #22543d;
+            font-weight: 600;
+        }
+        
+        .office-gap {
+            color: #742a2a;
+            font-weight: 600;
+        }
+        
+        .opportunities {
+            padding: 1.5rem;
+        }
+        
+        .opp-header {
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: #2d3748;
+        }
+        
+        .opp-item {
+            background: #fffaf0;
+            border-left: 4px solid #ed8936;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-radius: 6px;
+        }
+        
+        .opp-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+        }
+        
+        .opp-title {
+            font-size: 0.85rem;
+            color: #718096;
+            margin-bottom: 0.5rem;
+        }
+        
+        .opp-signal {
+            font-size: 0.85rem;
+            color: #c05621;
+            font-weight: 600;
+        }
+        
+        .action-button {
+            background: #2563eb;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 6px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+            width: 100%;
+        }
+        
+        .action-button:hover {
+            background: #1e40af;
+        }
+        
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #4a5568;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div>
+                <h1>🎯 Account Intelligence Dashboard</h1>
+                <div class="consultant-info">Sarah Martinez - Senior Consultant, Operations Practice</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="font-size: 0.9rem; opacity: 0.9;">15 accounts monitored</div>
+                <div style="font-size: 0.9rem; opacity: 0.9;">Last updated: 2 minutes ago</div>
+            </div>
+        </div>
+
+        <!-- HOT ALERTS -->
+        <div class="hot-alerts">
+            <div class="hot-header">🔥 High Priority Actions This Week (3)</div>
+            <div class="hot-grid">
+                <div class="hot-item">
+                    <div class="hot-account">Delta Air Lines</div>
+                    <div class="hot-contact">Sarah Martinez - VP Operations Analytics</div>
+                    <div class="hot-reason">15 articles viewed in 7 days • Researching operations consulting firms • RFP expected this month</div>
+                </div>
+                <div class="hot-item">
+                    <div class="hot-account">McKesson</div>
+                    <div class="hot-contact">Francisco Fraga - EVP & CIO/CTO</div>
+                    <div class="hot-reason">Healthcare IT research spike • 12 views in 5 days • Buying committee forming</div>
+                </div>
+                <div class="hot-item">
+                    <div class="hot-account">Home Depot</div>
+                    <div class="hot-contact">New CFO - 90-day window</div>
+                    <div class="hot-reason">Leadership transition • Onboarding phase • 8 warm intro paths identified</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SUMMARY STATS -->
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-value">34%</div>
+                <div class="stat-label">Average Coverage Across Accounts</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">$385M</div>
+                <div class="stat-label">Total Pipeline Identified</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">47</div>
+                <div class="stat-label">Hot Opportunities</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value">12</div>
+                <div class="stat-label">Active Buyer Signals This Week</div>
+            </div>
+        </div>
+
+        <!-- ACCOUNTS GRID -->
+        <div class="accounts-grid">
+            
+            <!-- DELTA -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-name">Delta Air Lines</div>
+                    <div class="account-meta">Fortune 500 • Airlines • Atlanta, GA</div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Coverage: 20%</div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar coverage-bad" style="width: 20%;">
+                            <span class="coverage-label">1 of 5 offices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="offices-breakdown">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Office Coverage:</div>
+                    <div class="office-row">
+                        <span>Finance</span>
+                        <span class="office-covered">✓ Dan Janki (CFO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Operations</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Revenue</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Technology</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>HR / People</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                </div>
+                
+                <div class="opportunities">
+                    <div class="opp-header">🔥 Hot Opportunities (3)</div>
+                    
+                    <div class="opp-item" style="background: #fff5f5; border-left-color: #f56565;">
+                        <div class="opp-name">Sarah Martinez</div>
+                        <div class="opp-title">VP, Operations Analytics - $6M budget</div>
+                        <div class="opp-signal">🔥 URGENT: 15 articles in 7 days | RFP this month | 3 internal connections</div>
+                    </div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">Amanda Foster</div>
+                        <div class="opp-title">VP, Operations Strategy - $7M budget</div>
+                        <div class="opp-signal">Strategic intent: 19 views in 10 days | Multi-year engagement</div>
+                    </div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">Michael Chen</div>
+                        <div class="opp-title">VP, TechOps Transformation - $8M budget</div>
+                        <div class="opp-signal">Moderate: 8 views in 14 days | Planning phase Q2 start</div>
+                    </div>
+                    
+                    <button class="action-button">View Full Account Intelligence →</button>
+                </div>
+            </div>
+
+            <!-- McKESSON -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-name">McKesson Corporation</div>
+                    <div class="account-meta">Fortune 10 • Healthcare Distribution • Irving, TX</div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Coverage: 20%</div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar coverage-bad" style="width: 20%;">
+                            <span class="coverage-label">1 of 5 offices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="offices-breakdown">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Office Coverage:</div>
+                    <div class="office-row">
+                        <span>Finance</span>
+                        <span class="office-covered">✓ Britt Vitalone (CFO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Operations</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Strategy / Revenue</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Technology</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>HR / People</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                </div>
+                
+                <div class="opportunities">
+                    <div class="opp-header">🔥 Hot Opportunities (2)</div>
+                    
+                    <div class="opp-item" style="background: #fff5f5; border-left-color: #f56565;">
+                        <div class="opp-name">Francisco Fraga</div>
+                        <div class="opp-title">EVP & CIO/CTO - $40M budget</div>
+                        <div class="opp-signal">🔥 HIGH INTENT: Healthcare IT research spike | 12 views in 5 days</div>
+                    </div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">Joan Eliasek</div>
+                        <div class="opp-title">President, NA Pharma Distribution - $35M</div>
+                        <div class="opp-signal">Supply chain transformation initiative identified</div>
+                    </div>
+                    
+                    <button class="action-button">View Full Account Intelligence →</button>
+                </div>
+            </div>
+
+            <!-- HOME DEPOT -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-name">Home Depot</div>
+                    <div class="account-meta">Fortune 50 • Retail • Atlanta, GA • TARGET ACCOUNT</div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Coverage: 0%</div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar coverage-bad" style="width: 5%;">
+                            <span class="coverage-label" style="color: #2d3748;">0 of 5 offices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="offices-breakdown">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Office Coverage:</div>
+                    <div class="office-row">
+                        <span>Finance</span>
+                        <span class="office-gap">✗ No contact (NEW CFO 6mo ago)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Operations</span>
+                        <span class="office-gap">✗ No contact ($40M initiative)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Revenue</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Technology</span>
+                        <span class="office-gap">✗ No contact ($50M cloud)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>HR / People</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                </div>
+                
+                <div class="opportunities">
+                    <div class="opp-header">🎯 Entry Opportunities</div>
+                    
+                    <div class="opp-item" style="background: #fff5f5; border-left-color: #f56565;">
+                        <div class="opp-name">New CFO (hired 6 months ago)</div>
+                        <div class="opp-title">90-day onboarding window opportunity</div>
+                        <div class="opp-signal">🔥 TIMING: New leadership = receptive to new relationships</div>
+                    </div>
+                    
+                    <div class="opp-item" style="background: #f0fff4; border-left-color: #48bb78;">
+                        <div class="opp-name">8 Warm Intro Paths Found</div>
+                        <div class="opp-title">Via firm-wide network intelligence</div>
+                        <div class="opp-signal">✓ 2 former HD employees on team | 3 alumni connections | 1 board relationship</div>
+                    </div>
+                    
+                    <button class="action-button">View Entry Strategy →</button>
+                </div>
+            </div>
+
+            <!-- WALMART -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-name">Walmart</div>
+                    <div class="account-meta">Fortune 1 • Retail • Bentonville, AR</div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Coverage: 40%</div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar" style="width: 40%;">
+                            <span class="coverage-label">2 of 5 offices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="offices-breakdown">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Office Coverage:</div>
+                    <div class="office-row">
+                        <span>Finance</span>
+                        <span class="office-covered">✓ John David Rainey (CFO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Operations</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Revenue</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Technology</span>
+                        <span class="office-covered">✓ Suresh Kumar (CTO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>HR / People</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                </div>
+                
+                <div class="opportunities">
+                    <div class="opp-header">Opportunities (2)</div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">EVP, Operations</div>
+                        <div class="opp-title">Supply chain transformation - $60M</div>
+                        <div class="opp-signal">Moderate: Job postings indicate planning phase</div>
+                    </div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">Donna Morris</div>
+                        <div class="opp-title">EVP & Chief People Officer - $25M</div>
+                        <div class="opp-signal">Organizational effectiveness initiative Q2</div>
+                    </div>
+                    
+                    <button class="action-button">View Full Account Intelligence →</button>
+                </div>
+            </div>
+
+            <!-- TARGET -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-name">Target Corporation</div>
+                    <div class="account-meta">Fortune 50 • Retail • Minneapolis, MN</div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Coverage: 60%</div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar" style="width: 60%;">
+                            <span class="coverage-label">3 of 5 offices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="offices-breakdown">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Office Coverage:</div>
+                    <div class="office-row">
+                        <span>Finance</span>
+                        <span class="office-covered">✓ Michael Fiddelke (CFO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Operations</span>
+                        <span class="office-covered">✓ John Mulligan (COO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Revenue</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Technology</span>
+                        <span class="office-covered">✓ Brett Craig (CIO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>HR / People</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                </div>
+                
+                <div class="opportunities">
+                    <div class="opp-header">Opportunities (1)</div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">Chief Commercial Officer</div>
+                        <div class="opp-title">Revenue optimization strategy - $18M</div>
+                        <div class="opp-signal">Early planning: Initiative kickoff March</div>
+                    </div>
+                    
+                    <button class="action-button">View Full Account Intelligence →</button>
+                </div>
+            </div>
+
+            <!-- UNITED AIRLINES -->
+            <div class="account-card">
+                <div class="account-header">
+                    <div class="account-name">United Airlines</div>
+                    <div class="account-meta">Fortune 500 • Airlines • Chicago, IL</div>
+                </div>
+                
+                <div style="padding: 1.5rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Coverage: 20%</div>
+                    <div class="coverage-bar-container">
+                        <div class="coverage-bar coverage-bad" style="width: 20%;">
+                            <span class="coverage-label">1 of 5 offices</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="offices-breakdown">
+                    <div style="font-weight: 700; margin-bottom: 0.5rem;">Office Coverage:</div>
+                    <div class="office-row">
+                        <span>Finance</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Operations</span>
+                        <span class="office-covered">✓ Jon Roitman (COO)</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Revenue</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>Technology</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                    <div class="office-row">
+                        <span>HR / People</span>
+                        <span class="office-gap">✗ No contact</span>
+                    </div>
+                </div>
+                
+                <div class="opportunities">
+                    <div class="opp-header">Opportunities (2)</div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">Mike Leskinen</div>
+                        <div class="opp-title">VP Finance - $8M budget</div>
+                        <div class="opp-signal">FP&A transformation planning phase</div>
+                    </div>
+                    
+                    <div class="opp-item">
+                        <div class="opp-name">CTO Organization</div>
+                        <div class="opp-title">Digital transformation - $35M</div>
+                        <div class="opp-signal">Tech modernization Q3 start</div>
+                    </div>
+                    
+                    <button class="action-button">View Full Account Intelligence →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</body>
+</html>
